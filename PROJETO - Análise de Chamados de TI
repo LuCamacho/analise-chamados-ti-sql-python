@@ -1,0 +1,85 @@
+1️⃣ Estrutura do repositório
+
+analise-chamados-ti-sql-python/
+├── sql/
+│   ├── 01_create_tables.sql
+│   ├── 02_insert_data.sql
+│   └── 03_queries.sql
+├── python/
+│   └── analysis.py
+├── dashboard/
+│   └── dashboard.pbix   # ou streamlit_app.py
+├── README.md
+
+2️⃣ SQL — Criação das tabelas
+
+CREATE TABLE chamados (
+    id_chamado INTEGER PRIMARY KEY,
+    data_abertura DATE,
+    data_fechamento DATE,
+    categoria TEXT,
+    prioridade TEXT,
+    status TEXT,
+    tecnico TEXT,
+    sla_horas INTEGER
+);
+
+3️⃣ SQL — Inserção de dados fictícios
+
+INSERT INTO chamados VALUES
+(1, '2024-01-05', '2024-01-05', 'Rede', 'Alta', 'Fechado', 'Carlos', 4),
+(2, '2024-01-06', '2024-01-07', 'SAP', 'Crítica', 'Fechado', 'Ana', 8),
+(3, '2024-01-06', '2024-01-10', 'Hardware', 'Média', 'Fechado', 'João', 24),
+(4, '2024-01-07', NULL, 'Software', 'Baixa', 'Aberto', 'Carlos', 48),
+(5, '2024-01-08', '2024-01-08', 'Power BI', 'Alta', 'Fechado', 'Ana', 6);
+
+4️⃣ SQL — Consultas analíticas
+
+📄 sql/03_queries.sql
+
+🔹 Chamados por categoria
+SELECT categoria, COUNT(*) AS total_chamados
+FROM chamados
+GROUP BY categoria;
+
+🔹 Tempo médio de atendimento (horas)
+SELECT 
+    AVG(julianday(data_fechamento) - julianday(data_abertura)) * 24 
+    AS tempo_medio_horas
+FROM chamados
+WHERE status = 'Fechado';
+
+🔹 Chamados por técnico
+SELECT tecnico, COUNT(*) AS total
+FROM chamados
+GROUP BY tecnico;
+
+5️⃣ Python — Análise com Pandas
+
+📄 python/analysis.py
+
+import sqlite3
+import pandas as pd
+
+# conexão com banco SQLite
+conn = sqlite3.connect('chamados.db')
+query = """
+SELECT 
+    categoria,
+    COUNT(*) AS total_chamados
+FROM chamados
+GROUP BY categoria
+"""
+df = pd.read_sql(query, conn)
+print(df)
+conn.close()
+
+6️⃣ Dashboard (Power BI ou Streamlit)
+Power BI
+Conecte no SQLite ou CSV
+Gráficos:
+Chamados por categoria
+Chamados por técnico
+SLA médio
+Abertos x Fechados
+
